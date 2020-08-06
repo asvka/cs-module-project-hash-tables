@@ -21,8 +21,9 @@ class HashTable:
     """
 
     def __init__(self, capacity):
-        # Your code here
-
+        self.capacity = capacity
+        self.HashTable = [None] * capacity
+        self.size = 0
 
     def get_num_slots(self):
         """
@@ -34,7 +35,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return len(self.HashTable)
 
 
     def get_load_factor(self):
@@ -43,7 +44,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return self.size / self.get_num_slots()
 
 
     def fnv1(self, key):
@@ -52,8 +53,16 @@ class HashTable:
 
         Implement this, and/or DJB2.
         """
+        FNV_prime = 1099511628211
+        offset_basis = 14695981039346656037
 
-        # Your code here
+        hashed = offset_basis
+
+        str_bytes = key.encode()
+        for a in str_bytes:
+            hashed = hashed * FNV_prime
+            hashed = hashed ^ a
+        return hashed
 
 
     def djb2(self, key):
@@ -70,8 +79,8 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        return self.fnv1(key) % self.capacity
+        # return self.djb2(key) % self.capacity
 
     def put(self, key, value):
         """
@@ -81,7 +90,11 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        new_entry = HashTableEntry(key, value)
+        index = self.hash_index(key)
+        self.HashTable[index] = new_entry
+        self.size += 1
+
 
 
     def delete(self, key):
@@ -92,8 +105,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
-
+        index = self.hash_index(key)
+        self.HashTable[index].value = None
 
     def get(self, key):
         """
@@ -103,7 +116,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        index = self.hash_index(key)
+        return self.HashTable[index].value
 
 
     def resize(self, new_capacity):
